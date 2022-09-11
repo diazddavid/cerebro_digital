@@ -1,0 +1,80 @@
+<!doctype html>
+
+{% load static %}
+
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="canonical" href="https://html5-templates.com/" />
+    <title>Simple Website Template with Sticky Sidebar</title>
+    <meta name="description" content="Free responsive website HTML theme with sticky sidebar for both desktop and mobile. ">
+    <link rel="stylesheet" href="{% static "style.css"%}">
+    <script src="{% static "script.js"%}"></script>
+</head>
+<body>
+<header>
+
+
+		<a href="/" id="mobileLogo">HTML5 Templates</a>
+		<div id="headerRight">
+			<nav>
+				<ul>
+					<li><a href="/admin/">Admin</a>
+					<li><a rel="nofollow" href="">Bibliografia</a>
+					<li><a rel="nofollow" href="">Subrayados</a>
+					<li><a rel="nofollow" href="">Zettelcasten</a>
+					<li><a rel="nofollow" href="">Referencias</a>
+					<li><a rel="nofollow" href="">Tags</a>
+					<li><a rel="nofollow" href="">Aleatorio</a>
+					<li><a rel="nofollow" href="">Nuevos</a>
+					<li><a rel="nofollow" href="https://htmlg.com/html-editor/">HTML Editor</a>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</header>
+<div id="wrapall">
+<!--
+	<div id="sidebar">
+		<div id="stickThis">
+			<div id="sidebarContent">
+				<a id="logo" href="https://html5-templates.com/">HTML5 Templates</a>
+				<aside>
+					<div>Sidebar 1</div>
+					<div>Sidebar 2</div>
+					<div>Sidebar 3</div>
+					<div>Sidebar 4</div>
+					<div>Sidebar 5</div>
+					<div>Sidebar 6</div>
+					<div>Sidebar 7</div>
+					<a class="back2Top" href="#">⮝&nbsp;Back to&nbsp;top&nbsp;⮝</a>
+				</aside>
+			</div>
+		</div>
+		<div id="stick-here"></div>
+	</div>
+-->
+	<div id="main">
+		<section id="page">
+			<main>
+        {% block content %}
+        {% endblock %}
+
+
+				<!-- <article>
+					<h2>Simple Website Template with Sticky Sidebar</h2>
+					<p><strong>Free responsive website HTML theme with sticky sidebar for both desktop and mobile. With social media icons and toggle manu and sidebar on mobile.</strong></p>
+					<p><strong>You are welcome to copy, edit and use this template for free as long as you leave a visible link back to this website or you <a href="https://www.paypal.com/paypalme/ruwix" target="_blank">donate through PayPal</a>.</strong></p>
+				</article>
+
+
+			<footer>
+				<p>&copy; You can copy, edit and publish this template but please leave a visible link to&nbsp;our&nbsp;website. <a rel="nofollow" href="https://html5-templates.com/" target="_blank" rel="nofollow">HTML5&nbsp;Templates</a></p>
+			</footer> -->
+		</section>
+	</div>
+</div>
+</body>
+</html>

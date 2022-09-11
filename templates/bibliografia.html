@@ -1,0 +1,33 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1>Bibliografia</h1>
+<p>
+<form id="formButton" action="/">
+    <input type="submit" value="Nuevo Item" />
+</form>
+<form id="formButton" action="/">
+    <input type="submit" value="Busqueda" />
+</form>
+</p>
+{% for linea_libros in bibliografia %}
+<table border="1" style="border-collapse: collapse; width: 100%;margin:50px">
+<tbody>
+<article>
+<tr >
+  {% for libro in linea_libros %}
+    <td style="width: 14.2857%;text-align:center;"><h2>{{libro.nombre}}</h2></td>
+  {% endfor %}
+</tr>
+<tr style="margin:50px">
+  {% for libro in linea_libros %}
+    <td style="width: 14.2857%;"><a href=/biligrafia/{{libro.id}}><img id="tabla_biblio" src={{libro.imagen.url}}></a></td>
+  {% endfor %}
+</tr>
+</article>
+
+</tbody>
+</table>
+{% endfor %}
+
+{% endblock %}
