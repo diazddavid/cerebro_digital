@@ -23,11 +23,14 @@ from django.views.static import serve
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('prueba/', views.index),
-
     # path('.*/(.*.css)$', serve),
     # path('.*/(.*.js)$', serve),
-    path('^(?P<path>.*)$', views.index),
-    re_path(r'.*', views.index),
+    path('bibliografia', views.bibliografia),
+    path('nuevos_items', views.nuevos_items),
+    path('procesar_txt', views.procesar_txt),
+    path('editar_extracto/<int:id>', views.editar_extracto),
+    path('eliminar_referencia/<int:id>', views.eliminar_referencia),
+    path('eliminar_extracto/<int:id>', views.eliminar_extracto),
+    path('', views.bibliografia),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

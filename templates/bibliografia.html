@@ -16,12 +16,12 @@
 <article>
 <tr >
   {% for libro in linea_libros %}
-    <td style="width: 14.2857%;text-align:center;"><h2>{{libro.nombre}}</h2></td>
+    <td style="width: 14.2857%;text-align:center;height:30px"><h3>{{libro.nombre}}</h3></td>
   {% endfor %}
 </tr>
 <tr style="margin:50px">
   {% for libro in linea_libros %}
-    <td style="width: 14.2857%;"><a href=/biligrafia/{{libro.id}}><img id="tabla_biblio" src={{libro.imagen.url}}></a></td>
+    <td style="width: 14.2857%;"><a href=/bibliografia/{{libro.id}}><img id="tabla_biblio" src={{libro.imagen.url}}></a></td>
   {% endfor %}
 </tr>
 </article>

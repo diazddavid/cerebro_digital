@@ -1,0 +1,222 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1>Bibliografia</h1>
+
+
+
+<button type="button" onclick="openForm()">Procesar TXT</button>
+
+<!-- The form -->
+<div class="form-popup" id="myForm">
+  <form method="post" action="/procesar_txt" enctype="multipart/form-data">
+      {% csrf_token %}
+      <p style=" margin: 10px 10px 10px 10px">
+          <label>Add file (single): </label><br/>
+          <input type="file" name="fichero_txt">
+      </p>
+      <p style=" margin: 10px 10px 10px 10px"> Bibliografia
+        <input type="checkbox" name="contains_biblio">
+        <select id="biblio" name="biblio">
+          {% for biblio in biblio_list %}
+            <option value="{{biblio.id}}">{{biblio.nombre}}</option>
+          {% endfor %}
+        </select>
+        <p>
+          <input type="submit">
+          <button type="button" class="btn cancel" onclick="closeForm()">Cerrar</button>
+  </form>
+
+</div>
+
+
+
+<p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
+  Subrayados
+</p>
+<article>
+
+  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <tbody>
+
+      <tr style="height:30px">
+        <td style="width: 40%;font-weight:bold">Texto</td>
+        <td style="width: 8%;font-weight:bold">Tag</td>
+        <td style="width: 8%;font-weight:bold">Libro</td>
+        <!-- <td style="width: 12.5%;">Tipo</td> -->
+        <td style="width: 8%;font-weight:bold">Posicion</td>
+        <td style="width: 8%;font-weight:bold">Pensar</td>
+        <td style="width: 8%;font-weight:bold">Eliminar</td>
+        <td style="width: 8%;font-weight:bold">Enviar</td>
+      </tr>
+
+
+    {% for Subrayados in subrayados_huerfanas %}
+    <form method="post" action="/editar_extracto/{{ Subrayados.id }}" id="sub_{{ Subrayados.id }}" enctype="multipart/form-data">
+        {% csrf_token %}
+      <tr style="height:30px">
+        <td style="width: 40%;"><textarea rows="4" cols="60" name="extracto" form="sub_{{ Subrayados.id }}">{{ Subrayados.extracto }}</textarea></td>
+        <td style="width: 8%;vertical-align: middle;">
+          <select name="etiqueta" size="3">
+            {% for tag in tag_list %}
+              <option {% if tag.nombre == Subrayados.etiqueta.all.first.nombre %} selected="selected" {% endif %}> {{ tag.nombre }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td style="width: 8%;vertical-align: middle;">
+          <select id="biblio" name="biblio">
+            {% for biblio in biblio_list %}
+
+              <option value="{{biblio.id}}" {% if biblio.nombre == Subrayados.bibliografia.nombre %} selected="selected" {% endif %}>{{biblio.nombre}}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td style="width: 8%;vertical-align: middle;"><input type="text" size="1" name="posicion" value="{{ Subrayados.posicion}}" /></td>
+        <!-- <td style="width: 8%;">{{ Subrayados.tipo.nombre}}</td> -->
+        <td style="width: 8%;vertical-align: middle;"><input type="checkbox" name="pensar" {% if Subrayados.pensar == 1 %} checked {% endif %}></td>
+        <td style="width: 8%;vertical-align: middle;"><button type="button" class="btn cancel" onclick="eliminar_extracto({{ Subrayados.id}})">Eliminar</button></td>
+        <td style="width: 8%;vertical-align: middle;"><input type="submit"></td>
+      </tr>
+    </form>
+
+    {% endfor %}
+  </tbody>
+  </table>
+
+
+</article>
+<p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
+  Referencias
+</p>
+<article>
+
+  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <tbody>
+
+      <tr style="height:30px">
+        <td style="width: 30%;font-weight:bold">Referencia</td>
+        <td style="width: 7%;font-weight:bold">Tipo</td>
+        <td style="width: 20%;font-weight:bold">Comentario</td>
+        <!-- <td style="width: 12.5%;">Tipo</td> -->
+        <td style="width: 20%;font-weight:bold">Bibliografia</td>
+        <td style="width: 8%;font-weight:bold">Eliminar</td>
+        <td style="width: 8%;font-weight:bold">Enviar</td>
+      </tr>
+
+
+    {% for Referencia in referencias_huerfanas %}
+    <form method="post" action="/editar_referencia/{{ Referencia.id }}" id="ref_{{ Referencia.id }}" enctype="multipart/form-data">
+        {% csrf_token %}
+      <tr style="height:30px">
+        <td style="width: 35%;"><textarea rows="1" cols="50" name="Referencia" form="ref_{{ Referencia.id }}">{{ Referencia.referencia }}</textarea></td>
+        <td style="width: 7%;vertical-align: middle;">
+          <select name="etiqueta" size="3">
+            {% for tipo in tipo_list %}
+              <option {% if tipo.nombre == Referencia.tipo.all.first.nombre %} selected="selected" {% endif %}> {{ tipo.nombre }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td style="width: 20%;"><textarea rows="1" cols="30" name="Comentario" form="ref_{{ Referencia.id }}">{{ Referencia.comentario }}</textarea></td>
+        <td style="width: 20%; vertical-align: up;">
+          <select id="biblio" name="biblio">
+            {% for biblio in biblio_list %}
+              <option value="{{biblio.id}}" {% if biblio.nombre == Referencia.bibliografia.all.first.nombre %} selected="selected" {% endif %}>{{biblio.nombre}}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td style="width: 8%;vertical-align: up;"><button type="button" class="btn cancel" onclick="eliminar_referencia({{ Referencia.id}})">Eliminar</button></td>
+        <td style="width: 8%;vertical-align: up;"><input type="submit"></td>
+      </tr>
+    </form>
+
+    {% endfor %}
+
+  </tbody>
+  </table>
+
+
+</article>
+
+<p style="font-size:50px; font-weight:bold; margin: 50px 0px 20px 10px">
+  Zettelcasten
+</p>
+<article>
+
+  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <tbody>
+
+      <tr style="height:30px">
+        <td style="width: 40%;font-weight:bold">Texto</td>
+        <td style="width: 10%;font-weight:bold">Tag</td>
+        <td style="width: 10%;font-weight:bold">Extracto</td>
+        <td style="width: 10%;font-weight:bold">Zettelcasten Relacionado</td>
+        <td style="width: 10%;font-weight:bold">Eliminar</td>
+        <td style="width: 10%;font-weight:bold">Enviar</td>
+      </tr>
+
+    {% for zettlecasten in zettlecasten_huerfanas %}
+    <form method="post" action="/editar_zettelcasten/{{ zettlecasten.id }}" id="zet_{{ zettlecasten.id }}" enctype="multipart/form-data">
+        {% csrf_token %}
+      <tr style="height:30px">
+        <td style="width: 40%;"><textarea rows="1" cols="60" name="contenido" form="zet_{{ zettlecasten.id }}">{{ zettlecasten.contenido }}</textarea></td>
+        <td style="width: 10%;vertical-align: middle;">
+          <select name="etiqueta" size="3">
+            {% for tag in tag_list %}
+              <option {% if tag.nombre == zettlecasten.etiqueta.all.first.nombre %} selected="selected" {% endif %}> {{ tag.nombre }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td style="width: 10%;vertical-align: up;"><button type="button" class="btn cancel" onclick="relacionar_extracto_zettel({{ zettlecasten.id }})">Extracto</button></td>
+        <td style="width: 10%;vertical-align: up;"><button type="button" class="btn cancel" onclick="relacionar_zettel({{ zettlecasten.id }})">Zettelcasten</button></td>
+        <td style="width: 10%;vertical-align: up;"><button type="button" class="btn cancel" onclick="eliminar_zettel({{ zettlecasten.id }})">Eliminar</button></td>
+        <td style="width: 10%;vertical-align: up;"><input type="submit"></td>
+      </tr>
+    </form>
+
+    {% endfor %}
+
+  </tbody>
+  </table>
+
+
+</article>
+
+<script>
+// When the user clicks on <div>, open the popup
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+
+function btnClick() {
+    if (!validData())
+        return false;
+}
+
+function eliminar_extracto(id) {
+  window.location.replace("eliminar_extracto/".concat(id));
+}
+
+function eliminar_referencia(id) {
+  window.location.replace("eliminar_referencia/".concat(id));
+}
+
+function eliminar_zettel(id) {
+  window.location.replace("eliminar_zettel/".concat(id));
+}
+
+function relacionar_zettel(id) {
+  window.location.replace("relacionar_zettel/".concat(id));
+}
+
+function relacionar_extracto_zettel(id) {
+  window.location.replace("relacionar_extracto_zettel/".concat(id));
+}
+
+</script>
+
+
+{% endblock %}
