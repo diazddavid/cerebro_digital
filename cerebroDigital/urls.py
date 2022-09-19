@@ -31,6 +31,8 @@ urlpatterns = [
     path('editar_extracto/<int:id>', views.editar_extracto),
     path('eliminar_referencia/<int:id>', views.eliminar_referencia),
     path('eliminar_extracto/<int:id>', views.eliminar_extracto),
+    path('nuevo_biblio', views.nuevo_biblio),
+    path('procesar_nuevo_biblio', views.procesar_biblio),
     path('', views.bibliografia),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

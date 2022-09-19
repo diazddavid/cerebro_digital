@@ -1,0 +1,83 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1>Nuevo Bibliografia</h1>
+
+<!-- <div  id="myForm" style=" "> -->
+<form method="post" id="myForm"  action="/procesar_nuevo_biblio" enctype="multipart/form-data">
+<div style="width: 50%; float:left; margin: 10px 0px">
+
+  <p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
+  </p>
+      {% csrf_token %}
+  <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -26px">
+  Nombre del elemento</p>
+  <textarea rows="2" cols="40" name="Nombre" form="myForm" style="font-size:20px;margin: 0px 0px 10px -100px"></textarea>
+
+  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
+  Tipo de Elemento</p>
+  <p style=" margin: 10px 10px 10px 50px; font-size:20px;">
+    <select id="tipo" name="tipo" style="font-size:20px;;margin: 0px 0px 10px ">
+      {% for tipo_biblio in tipo_list %}
+        <option value="{{tipo_biblio.id}}">{{tipo_biblio.nombre}}</option>
+      {% endfor %}
+    </select>
+  </p>
+
+  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
+  Autor</p>
+  <p style=" margin: 10px 10px 10px 50px; font-size:20px;">
+    <select id="autor" name="autor" style="font-size:20px;margin: 0px 0px 10px " onchange="change_form(this.selectedIndex);">
+      {% for autor in autor_list %}
+        <option value="{{autor.id}}">{{autor.nombre}}</option>
+      {% endfor %}
+        <option value="nuevo">Nuevo</option>
+    </select>
+  </p>
+
+  <div style="display:none" id="new_autor">
+    <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -26px">
+    Nuevo Autor</p>
+    <textarea rows="1" cols="30" name="nuevo_autor" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea>
+  </div>
+</div>
+
+<div style="width: 50%; float:right; margin: 20px 0px"">
+
+  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
+  Seleccionar Imagen</p>
+  <p style=" margin: 10px 10px 10px 10px">
+      <input type="file" name="imagen_nuevo" style="font-size:20px;;margin: 0px 0px 10px ">
+  </p>
+
+  <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -26px">
+  URL</p>
+  <textarea rows="1" cols="30" name="url" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea>
+
+  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
+  Fecha de Inicio</p>
+  <input type="date" id="start" name="fecha_inicio" style="font-size:20px"
+  value="{{ fecha_hoy }}"
+  min="2022-01-01" max="2030-12-31">
+
+
+</div>
+
+<p><input type="submit" style="font-size:20px;position: absolute;top: 95%;left: 45%;"></p>
+
+</form>
+
+<script>
+
+  function change_form(new_index) {
+    if (new_index=={{ autor_list|length }}) {
+      document.getElementById("new_autor").style.display = "block";
+    }else{
+      document.getElementById("new_autor").style.display = "none";
+
+    }
+  }
+</script>
+
+
+{% endblock %}

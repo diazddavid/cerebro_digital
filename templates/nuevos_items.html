@@ -5,15 +5,47 @@
 
 
 
-<button type="button" onclick="openForm()">Procesar TXT</button>
+<button type="button" onclick="openForm_txt()">Procesar TXT</button>
 
 <!-- The form -->
 <div class="form-popup" id="myForm">
+  <p style=" margin: 10px 10px 10px 10px">
+      <label>Procesar TXT</label><br/>
+  </p>
   <form method="post" action="/procesar_txt" enctype="multipart/form-data">
       {% csrf_token %}
+      <input type="checkbox" name="is_txt" checked="checked" style="display:none">
       <p style=" margin: 10px 10px 10px 10px">
           <label>Add file (single): </label><br/>
           <input type="file" name="fichero_txt">
+      </p>
+      <p style=" margin: 10px 10px 10px 10px"> Bibliografia
+        <input type="checkbox" name="contains_biblio">
+        <select id="biblio" name="biblio">
+          {% for biblio in biblio_list %}
+            <option value="{{biblio.id}}">{{biblio.nombre}}</option>
+          {% endfor %}
+        </select>
+        <p>
+          <input type="submit">
+          <button type="button" class="btn cancel" onclick="closeForm_hmtl()">Cerrar</button>
+  </form>
+
+</div>
+
+<button type="button" onclick="openForm_HTML()">Procesar HTML</button>
+
+<!-- The form -->
+<div class="form-popup" id="myForm_hmtl">
+  <p style=" margin: 10px 10px 10px 10px">
+      <label>Procesar HTML</label><br/>
+  </p>
+  <form method="post" action="/procesar_txt" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="checkbox" name="is_html" checked="checked" style="display:none">
+      <p style=" margin: 10px 10px 10px 10px">
+          <label>Add file (single): </label><br/>
+          <input type="file" name="fichero_html">
       </p>
       <p style=" margin: 10px 10px 10px 10px"> Bibliografia
         <input type="checkbox" name="contains_biblio">
@@ -183,13 +215,24 @@
 
 <script>
 // When the user clicks on <div>, open the popup
-function openForm() {
+function openForm_txt() {
+  document.getElementById("myForm_hmtl").style.display = "none";
   document.getElementById("myForm").style.display = "block";
 }
 
 function closeForm() {
   document.getElementById("myForm").style.display = "none";
 }
+
+function openForm_HTML() {
+  document.getElementById("myForm").style.display = "none";
+  document.getElementById("myForm_hmtl").style.display = "block";
+}
+
+function closeForm_hmtl() {
+  document.getElementById("myForm_hmtl").style.display = "none";
+}
+
 
 function btnClick() {
     if (!validData())
