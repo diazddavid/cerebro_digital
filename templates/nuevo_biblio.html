@@ -5,65 +5,120 @@
 
 <!-- <div  id="myForm" style=" "> -->
 <form method="post" id="myForm"  action="/procesar_nuevo_biblio" enctype="multipart/form-data">
-<div style="width: 50%; float:left; margin: 10px 0px">
+
+<p><input type="submit" style="font-weight:bold; font-size:30px; margin: 10px 400px"></p>
+
+<div style="width: 50%; float:left; margin: 0px 0px">
 
   <p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
   </p>
       {% csrf_token %}
-  <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -26px">
-  Nombre del elemento</p>
+  <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -36px">
+  Nombre del elemento:</p>
   <textarea rows="2" cols="40" name="Nombre" form="myForm" style="font-size:20px;margin: 0px 0px 10px -100px"></textarea>
 
-  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
-  Tipo de Elemento</p>
-  <p style=" margin: 10px 10px 10px 50px; font-size:20px;">
-    <select id="tipo" name="tipo" style="font-size:20px;;margin: 0px 0px 10px ">
-      {% for tipo_biblio in tipo_list %}
-        <option value="{{tipo_biblio.id}}">{{tipo_biblio.nombre}}</option>
-      {% endfor %}
+  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 30px -36px">
+  Tipo de Elemento:
+  <select id="tipo" name="tipo" style="font-size:20px;margin: 5px 0px 10px ">
+    {% for tipo_biblio in tipo_list %}
+      <option value="{{tipo_biblio.id}}">{{tipo_biblio.nombre}}</option>
+    {% endfor %}
+  </select>
+  </p>
+
+  <p style="font-size:30px; font-weight:bold; margin: -15px 100px 10px -36px">
+  Numero Autores:
+    <select id="num_autor" name="num_autor" style="font-size:20px;margin: 5px 0px 10px " onchange="change_authors(this.selectedIndex);">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
     </select>
   </p>
 
-  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
-  Autor</p>
-  <p style=" margin: 10px 10px 10px 50px; font-size:20px;">
-    <select id="autor" name="autor" style="font-size:20px;margin: 0px 0px 10px " onchange="change_form(this.selectedIndex);">
+  <p style="font-size:30px; font-weight:bold; margin: 10px 100px 10px -36px">
+  Autor 1:
+  <select id="autor" name="autor" style="font-size:20px;margin: 5px 0px 10px " onchange="change_form(this.selectedIndex);">
+    {% for autor in autor_list %}
+      <option value="{{autor.id}}">{{autor.nombre}}</option>
+    {% endfor %}
+      <option value="nuevo">Nuevo</option>
+  </select>
+  </p>
+
+
+  <div style="display:none" id="new_autor">
+    <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -36px">
+    Nuevo Autor 1:
+    <input type="text" id="nuevo_autor" name="nuevo_autor" size="20">
+    <!-- <textarea rows="1" cols="30" name="nuevo_autor" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea> -->
+    </p>
+  </div>
+
+
+  <div style="display:none" id="autor2">
+    <p style="font-size:30px; font-weight:bold; margin: 10px 100px 10px -36px">
+    Autor 2:
+    <select id="autor2" name="autor2" style="font-size:20px;margin: 5px 0px 10px " onchange="change_form2(this.selectedIndex);">
       {% for autor in autor_list %}
         <option value="{{autor.id}}">{{autor.nombre}}</option>
       {% endfor %}
         <option value="nuevo">Nuevo</option>
     </select>
-  </p>
-
-  <div style="display:none" id="new_autor">
-    <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -26px">
-    Nuevo Autor</p>
-    <textarea rows="1" cols="30" name="nuevo_autor" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea>
+    </p>
   </div>
+
+  <div style="display:none" id="new_autor2">
+    <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -36px">
+    Nuevo Autor 2:
+    <input type="text" id="nuevo_autor2" name="nuevo_autor2" size="20">
+    <!-- <textarea rows="1" cols="30" name="nuevo_autor" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea> -->
+    </p>
+  </div>
+
 </div>
 
-<div style="width: 50%; float:right; margin: 20px 0px"">
+<div style="width: 50%; float:right; margin: 10px 0px">
 
   <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
-  Seleccionar Imagen</p>
+  Seleccionar Imagen:</p>
   <p style=" margin: 10px 10px 10px 10px">
       <input type="file" name="imagen_nuevo" style="font-size:20px;;margin: 0px 0px 10px ">
   </p>
 
-  <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -26px">
-  URL</p>
-  <textarea rows="1" cols="30" name="url" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea>
+  <p style="font-size:30px; font-weight:bold; margin: 20px 0px 10px -26px">
+  URL:
+  <input type="text" id="url" name="url" size="50">
+  <!-- <textarea rows="1" cols="30" name="url" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea> -->
+  </p>
 
-  <p style="font-size:30px; font-weight:bold; margin: 10px 0px 10px -26px">
-  Fecha de Inicio</p>
+  <p style="font-size:30px; font-weight:bold; margin: 30px 0px 10px -26px">
+  Fecha de Inicio:
   <input type="date" id="start" name="fecha_inicio" style="font-size:20px"
   value="{{ fecha_hoy }}"
   min="2022-01-01" max="2030-12-31">
+</p>
 
-
+<div style="display:none" id="autor3">
+  <p style="font-size:30px; font-weight:bold; margin: 30px 100px 10px -26px">
+  Autor 3:
+  <select id="autor3" name="autor3" style="font-size:20px;margin: 5px 0px 10px " onchange="change_form3(this.selectedIndex);">
+    {% for autor in autor_list %}
+      <option value="{{autor.id}}">{{autor.nombre}}</option>
+    {% endfor %}
+      <option value="nuevo">Nuevo</option>
+  </select>
+  </p>
 </div>
 
-<p><input type="submit" style="font-size:20px;position: absolute;top: 95%;left: 45%;"></p>
+<div style="display:none" id="new_autor3">
+  <p style="font-size:30px; font-weight:bold; margin: 0px 0px 10px -26px">
+  Nuevo Autor 3:
+  <input type="text" id="nuevo_autor3" name="nuevo_autor3" size="20">
+  <!-- <textarea rows="1" cols="30" name="nuevo_autor" form="myForm" style="font-size:20px;margin: 0px 0px 10px 0px"></textarea> -->
+  </p>
+</div>
+
+</div>
 
 </form>
 
@@ -74,7 +129,38 @@
       document.getElementById("new_autor").style.display = "block";
     }else{
       document.getElementById("new_autor").style.display = "none";
+    }
+  }
 
+  function change_form2(new_index) {
+    if (new_index=={{ autor_list|length }}) {
+      document.getElementById("new_autor2").style.display = "block";
+    }else{
+      document.getElementById("new_autor2").style.display = "none";
+    }
+  }
+
+  function change_form3(new_index) {
+    if (new_index=={{ autor_list|length }}) {
+      document.getElementById("new_autor3").style.display = "block";
+    }else{
+      document.getElementById("new_autor3").style.display = "none";
+    }
+  }
+
+  function change_authors(number_autor){
+    if (number_autor==0){
+      document.getElementById("autor2").style.display = "none";
+        document.getElementById("new_autor2").style.display = "none";
+      document.getElementById("autor3").style.display = "none";
+        document.getElementById("new_autor3").style.display = "none";
+    } else if (number_autor==1){
+      document.getElementById("autor2").style.display = "block";
+      document.getElementById("autor3").style.display = "none";
+        document.getElementById("new_autor3").style.display = "none";
+    } else if (number_autor==2){
+      document.getElementById("autor2").style.display = "block";
+      document.getElementById("autor3").style.display = "block";
     }
   }
 </script>

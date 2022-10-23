@@ -1,65 +1,43 @@
 {% extends "index.html" %}
-{% load filtros_templates %}
+
 {% block content %}
-<h1 style=" margin: 10px 10px 10px 10px">Nuevos Items</h1>
+<h1 style="font-size:70px; margin: 10px 10px 10px 10px">{{biblio_obj.nombre}}</h1>
 
-<button type="button" onclick="openForm_txt()">Procesar TXT</button>
 
-<!-- The form -->
-<div class="form-popup" id="myForm">
-  <p style=" margin: 10px 10px 10px 10px">
-      <label>Procesar TXT</label><br/>
-  </p>
-  <form method="post" action="/procesar_txt" enctype="multipart/form-data">
-      {% csrf_token %}
-      <input type="checkbox" name="is_txt" checked="checked" style="display:none">
-      <p style=" margin: 10px 10px 10px 10px">
-          <label>Add file (single): </label><br/>
-          <input type="file" name="fichero_txt">
-      </p>
-      <p style=" margin: 10px 10px 10px 10px"> Bibliografia
-        <input type="checkbox" name="contains_biblio">
-        <select id="biblio" name="biblio">
-          {% for biblio in biblio_list %}
-            <option value="{{biblio.id}}">{{biblio.nombre}}</option>
-          {% endfor %}
-        </select>
-        <p>
-          <input type="submit">
-          <button type="button" class="btn cancel" onclick="closeForm_hmtl()">Cerrar</button>
-  </form>
+<div style="height: auto;">
+  <div style="width: 30%; float:left; margin: 20px 0px">
+    <img id="tabla_biblio" src={{biblio_obj.imagen.url}}>
+  </div>
 
-</div>
-
-<button type="button" onclick="openForm_HTML()">Procesar HTML</button>
-
-<!-- The form -->
-<div class="form-popup" id="myForm_hmtl">
-  <p style=" margin: 10px 10px 10px 10px">
-      <label>Procesar HTML</label><br/>
-  </p>
-  <form method="post" action="/procesar_txt" enctype="multipart/form-data">
-      {% csrf_token %}
-      <input type="checkbox" name="is_html" checked="checked" style="display:none">
-      <p style=" margin: 10px 10px 10px 10px">
-          <label>Add file (single): </label><br/>
-          <input type="file" name="fichero_html">
-      </p>
-      <p style=" margin: 10px 10px 10px 10px"> Bibliografia
-        <input type="checkbox" name="contains_biblio">
-        <select id="biblio" name="biblio">
-          {% for biblio in biblio_list %}
-            <option value="{{biblio.id}}">{{biblio.nombre}}</option>
-          {% endfor %}
-        </select>
-        <p>
-          <input type="submit">
-          <button type="button" class="btn cancel" onclick="closeForm()">Cerrar</button>
-  </form>
+  <div style="width: 70%;  height: 450px; float:right; margin: 20px 0px">
+    <p style="font-size:40px; font-weight:bold; margin: 10px 0px 20px 10px">
+      Autor/es
+    </p>
+    {% for autor in biblio_obj.autor.all %}
+    <p style="font-size:20px; font-weight:bold; margin: 10px 0px 20px 10px">
+      {{autor.nombre}}
+    </p>
+    {% endfor %}
+    <p style="font-size:40px; font-weight:bold; margin: 10px 0px 20px 10px">
+      Fecha Empezado
+    </p>
+    <p style="font-size:20px; font-weight:bold; margin: 10px 0px 20px 10px">
+      {{biblio_obj.fecha_empezado|date:"SHORT_DATE_FORMAT"}}
+    </p>
+    <p style="font-size:40px; font-weight:bold; margin: 10px 0px 20px 10px">
+      URL
+    </p>
+    <p style="font-size:20px; font-weight:bold; margin: 10px 0px 20px 10px">
+      <a href="{{biblio_obj.url}}">Enlace</a>
+    </p>
+  </div>
 
 </div>
 
-<button type="button" onclick="openForm_newTag()">Nueva Etiqueta</button>
+<div>
+  <button type="button" style="font-size:20px; font-weight:bold; margin: 70px 0px 20px 10px" onclick="openForm_newTag()">Nueva Etiqueta</button>
+
+</div>
 
 <!-- The form -->
 <div class="form-popup" id="myForm_Tag">
@@ -68,6 +46,7 @@
   </p>
   <form method="post" action="/nueva_etiqueta" enctype="multipart/form-data">
       {% csrf_token %}
+      <input type="checkbox" name="is_html" checked="checked" style="display:none">
       <p style=" margin: 10px 10px 10px 10px">
           <label>Nombre</label><br/>
           <input type="text" id="nombre" name="nombre">
@@ -87,30 +66,25 @@
           <option value="no">Huerfano</option>
         </select>
       </p>
-      <div style="display:none" id="etiqueta_padre2">
-        <p style=" margin: 10px 10px 10px 10px"> Etiqueta Padre
-          <select id="etiqueta_padre2" name="etiqueta_padre2">
-            {% for tag in tag_list %}
-              <option value="{{tag.id}}">{{tag.nombre}}</option>
-            {% endfor %}
-          </select>
-        </p>
-      </div>
-      <div style="display:none" id="etiqueta_padre3">
-        <p style=" margin: 10px 10px 10px 10px"> Etiqueta Padre
-          <select id="etiqueta_padre3" name="etiqueta_padre3">
-            {% for tag in tag_list %}
-              <option value="{{tag.id}}">{{tag.nombre}}</option>
-            {% endfor %}
-          </select>
-        </p>
-      </div>
+      <p id="etiqueta_padre2" style=" margin: 10px 10px 10px 10px; display:none"> Etiqueta Padre
+        <select  name="etiqueta_padre2">
+          {% for tag in tag_list %}
+            <option value="{{tag.id}}">{{tag.nombre}}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p id="etiqueta_padre3" style=" margin: 10px 10px 10px 10px; display:none"> Etiqueta Padre
+        <select name="etiqueta_padre3">
+          {% for tag in tag_list %}
+            <option value="{{tag.id}}">{{tag.nombre}}</option>
+          {% endfor %}
+        </select>
+      </p>
       <input type="submit">
       <button type="button" class="btn cancel" onclick="closeForm_newTag()">Cerrar</button>
   </form>
 
 </div>
-
 <p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
   Subrayados
 </p>
@@ -131,7 +105,7 @@
       </tr>
 
 
-    {% for Subrayados in subrayados_huerfanas %}
+    {% for Subrayados in extracto_list %}
     <form method="post" action="/editar_extracto/{{ Subrayados.id }}" id="sub_{{ Subrayados.id }}" enctype="multipart/form-data">
         {% csrf_token %}
       <tr style="height:30px">
@@ -143,15 +117,11 @@
               {{tag.nombre}}</p>
             {% endfor %}
           </div>
-          <!-- <select name="etiqueta" size="3">
-            {% for tag in tag_list %}
-              <option {% if tag.nombre == Subrayados.etiqueta.all.first.nombre %} selected="selected" {% endif %}> {{ tag.nombre }}</option>
-            {% endfor %}
-          </select> -->
         </td>
         <td style="width: 8%;vertical-align: middle;">
           <select id="biblio" name="biblio">
             {% for biblio in biblio_list %}
+
               <option value="{{biblio.id}}" {% if biblio.nombre == Subrayados.bibliografia.nombre %} selected="selected" {% endif %}>{{biblio.nombre}}</option>
             {% endfor %}
           </select>
@@ -181,7 +151,7 @@
       <tr style="height:30px">
         <td style="width: 30%;font-weight:bold">Referencia</td>
         <td style="width: 7%;font-weight:bold">Tipo</td>
-        <!-- <td style="width: 20%;font-weight:bold">Comentario</td> -->
+        <td style="width: 20%;font-weight:bold">Comentario</td>
         <!-- <td style="width: 12.5%;">Tipo</td> -->
         <td style="width: 20%;font-weight:bold">Bibliografia</td>
         <td style="width: 8%;font-weight:bold">Eliminar</td>
@@ -189,7 +159,7 @@
       </tr>
 
 
-    {% for Referencia in referencias_huerfanas %}
+    {% for Referencia in ref_list %}
     <form method="post" action="/editar_referencia/{{ Referencia.id }}" id="ref_{{ Referencia.id }}" enctype="multipart/form-data">
         {% csrf_token %}
       <tr style="height:30px">
@@ -201,7 +171,7 @@
             {% endfor %}
           </select>
         </td>
-        <!-- <td style="width: 20%;"><textarea rows="1" cols="30" name="Comentario" form="ref_{{ Referencia.id }}">{{ Referencia.comentario }}</textarea></td> -->
+        <td style="width: 20%;"><textarea rows="1" cols="30" name="Comentario" form="ref_{{ Referencia.id }}">{{ Referencia.comentario }}</textarea></td>
         <td style="width: 20%; vertical-align: up;">
           <select id="biblio" name="biblio">
             {% for biblio in biblio_list %}
@@ -222,57 +192,10 @@
 
 </article>
 
-<p style="font-size:50px; font-weight:bold; margin: 50px 0px 20px 10px">
-  Zettelcasten
-</p>
-<article>
-
-  <table border="1" style="border-collapse: collapse; width: 120%;">
-  <tbody>
-
-      <tr style="height:30px">
-        <td style="width: 40%;font-weight:bold">Texto</td>
-        <td style="width: 10%;font-weight:bold">Tag</td>
-        <td style="width: 10%;font-weight:bold">Extracto</td>
-        <td style="width: 10%;font-weight:bold">Zettelcasten Relacionado</td>
-        <td style="width: 10%;font-weight:bold">Eliminar</td>
-        <td style="width: 10%;font-weight:bold">Enviar</td>
-      </tr>
-
-    {% for zettlecasten in zettlecasten_huerfanas %}
-    <form method="post" action="/editar_zettelcasten/{{ zettlecasten.id }}" id="zet_{{ zettlecasten.id }}" enctype="multipart/form-data">
-        {% csrf_token %}
-      <tr style="height:30px">
-        <td style="width: 40%;"><textarea rows="1" cols="60" name="contenido" form="zet_{{ zettlecasten.id }}">{{ zettlecasten.contenido }}</textarea></td>
-        <td style="width: 10%;vertical-align: middle;">
-          <div  style="overflow-y: scroll; height:60px;">
-            {% for tag in tag_list %}
-            <p><input type="checkbox" name="tag_{{tag.id}}" id="tag_{{tag.id}}" {% if tag in zettlecasten.etiqueta.all %} checked {% endif %}/>
-              {{tag.nombre}}</p>
-            {% endfor %}
-          </div>
-        </td>
-        <td style="width: 10%;vertical-align: up;"><button type="button" class="btn cancel" onclick="relacionar_extracto_zettel({{ zettlecasten.id }})">Extracto</button></td>
-        <td style="width: 10%;vertical-align: up;"><button type="button" class="btn cancel" onclick="relacionar_zettel({{ zettlecasten.id }})">Zettelcasten</button></td>
-        <td style="width: 10%;vertical-align: up;"><button type="button" class="btn cancel" onclick="eliminar_zettel({{ zettlecasten.id }})">Eliminar</button></td>
-        <td style="width: 10%;vertical-align: up;"><input type="submit"></td>
-      </tr>
-    </form>
-
-    {% endfor %}
-
-  </tbody>
-  </table>
-
-
-</article>
-
 <script>
 // When the user clicks on <div>, open the popup
 
 function openForm_newTag(){
-  document.getElementById("myForm_hmtl").style.display = "none";
-  document.getElementById("myForm").style.display = "none";
   document.getElementById("myForm_Tag").style.display = "block";
 }
 
@@ -280,38 +203,17 @@ function closeForm_newTag() {
   document.getElementById("myForm_Tag").style.display = "none";
 }
 
-function openForm_txt() {
-  document.getElementById("myForm_hmtl").style.display = "none";
-  document.getElementById("myForm").style.display = "block";
-  document.getElementById("myForm_Tag").style.display = "none";
-}
-
-function closeForm() {
-  document.getElementById("myForm").style.display = "none";
-}
-
-function openForm_HTML() {
-  document.getElementById("myForm").style.display = "none";
-  document.getElementById("myForm_hmtl").style.display = "block";
-  document.getElementById("myForm_Tag").style.display = "none";
-}
-
-function closeForm_hmtl() {
-  document.getElementById("myForm_hmtl").style.display = "none";
-}
-
-
 function btnClick() {
     if (!validData())
         return false;
 }
 
 function eliminar_extracto(id) {
-  window.location.replace("/eliminar_extracto/".concat(id));
+  window.location.replace("eliminar_extracto/".concat(id));
 }
 
 function eliminar_referencia(id) {
-  window.location.replace("/eliminar_referencia/".concat(id));
+  window.location.replace("eliminar_referencia/".concat(id));
 }
 
 function eliminar_zettel(id) {
@@ -319,11 +221,11 @@ function eliminar_zettel(id) {
 }
 
 function relacionar_zettel(id) {
-  window.location.replace("/relacionar_zettel_zet/".concat(id));
+  window.location.replace("relacionar_zettel/".concat(id));
 }
 
 function relacionar_extracto_zettel(id) {
-  window.location.replace("/relacionar_zettel_ext/".concat(id));
+  window.location.replace("relacionar_extracto_zettel/".concat(id));
 }
 
 function more_dad(num_dad){
@@ -338,7 +240,6 @@ function more_dad(num_dad){
     document.getElementById("etiqueta_padre3").style.display = "block";
   }
 }
-
 
 </script>
 

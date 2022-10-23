@@ -1,0 +1,117 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1 style=" margin: 10px 10px 10px 10px">Aleatorios</h1>
+
+<div>
+  <button type="button" style="font-size:20px; font-weight:bold; margin: 50px 0px 20px 10px" onclick="generar_aleatorio()">Cambiar aleatorios</button>
+</div>
+
+<p style="font-size:40px; font-weight:bold; margin: 10px 0px 20px 10px">
+  Extractos Aleatorios
+</p>
+
+<table border="1" style="border-collapse: collapse; width: 120%;">
+<tbody>
+
+  <tr style="height:30px">
+    <td style="width: 3%">id</td>
+    <td style="width: 60%;font-weight:bold">Texto</td>
+    <td style="width: 10%;font-weight:bold">Tag</td>
+    <td style="width: 10%;font-weight:bold">Pertenece a</td>
+    <td style="width: 10%;font-weight:bold">Nuevo Zettel</td>
+  </tr>
+
+
+  {% for subrayado in extracto_aleatorio %}
+
+  <tr style="height:30px">
+    <td><a href="/extracto/{{subrayado.id}}">{{subrayado.id}}</a></td>
+    <td style="width: 60%">{{subrayado.extracto}}<p style="color:white">a</p></td>
+    <td style="width: 10%;vertical-align: middle;">
+      {% for tag in subrayado.etiqueta.all %}
+        <p>{{tag.nombre}}</p>
+      {% endfor %}
+      <p style="color:white">a</p>
+    </td>
+    <td style="width: 8%;vertical-align: middle;">
+      {{subrayado.bibliografia.nombre}} <p style="color:white">a</p>
+    </td>
+    <td style="width: 8%;vertical-align: up;"><button type="button" class="btn cancel" onclick="crear_zettle_ext({{ subrayado.id}})">Nuevo Zettel</button></td>
+
+  </tr>
+
+
+  {% endfor %}
+
+  <tr style="height:30px">
+    <td style="color:white">a</td>
+  </tr>
+
+</tbody>
+</table>
+
+
+<p style="font-size:40px; font-weight:bold; margin: 10px 0px 20px 10px">
+  Zettelcasten Aleatorios
+</p>
+
+<table border="1" style="border-collapse: collapse; width: 120%;">
+<tbody>
+
+  <tr style="height:30px">
+    <td style="width: 3%">id</td>
+    <td style="width: 60%;font-weight:bold">Texto</td>
+    <td style="width: 10%;font-weight:bold">Tag</td>
+    <td style="width: 10%;font-weight:bold">Nuevo Zettel</td>
+    <td style="width: 10%;font-weight:bold">Rel Zettel</td>
+    <td style="width: 10%;font-weight:bold">Rel Extracto</td>
+  </tr>
+
+
+  {% for zettel in zettel_aleatorio %}
+
+  <tr style="height:30px">
+    <td><a href="/extracto/{{zettel.id}}">{{zettel.id}}</a></td>
+    <td style="width: 60%">{{zettel.contenido}}<p style="color:white">a</p></td>
+    <td style="width: 10%;vertical-align: middle;">
+      {% for tag in zettel.etiqueta.all %}
+        <p>{{tag.nombre}}</p>
+      {% endfor %}
+      <p style="color:white">a</p>
+    </td>
+    <td style="width: 8%;vertical-align: up;"><button type="button" class="btn cancel" onclick="crear_zettel_zettel({{ zettel.id}})">Nuevo Zettel</button></td>
+    <td style="width: 8%;vertical-align: up;"><button type="button" class="btn cancel" onclick="relacionar_zettel_ext/{{ zettel.id}}">Extracto</button></td>
+    <td style="width: 8%;vertical-align: up;"><button type="button" class="btn cancel" onclick="relacionar_zettel_ext/{{ zettel.id}}">Zettel</button></td>
+
+  </tr>
+
+  {% endfor %}
+</tbody>
+</table>
+
+
+<script>
+// When the user clicks on <div>, open the popup
+
+function generar_aleatorio(){
+
+  window.location.replace("/generar_aleatorio");
+
+}
+
+function crear_zettel_zettel(id){
+  window.location.replace("/nuevo_zettelcasten_zet/"+id)
+}
+
+function crear_zettle_ext(id){
+  window.location.replace("/nuevo_zettelcasten_ext/"+id)
+}
+
+
+
+
+</script>
+
+
+{% endblock %}

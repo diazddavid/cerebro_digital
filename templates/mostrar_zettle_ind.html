@@ -1,0 +1,180 @@
+{% extends "index.html" %}
+
+{% block content %}
+<!-- The form -->
+<div class="form-popup" id="myForm_Tag">
+  <p style=" margin: 10px 10px 10px 10px">
+      <label>Nueva Etiqueta</label><br/>
+  </p>
+  <form method="post" action="/nueva_etiqueta" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="checkbox" name="is_html" checked="checked" style="display:none">
+      <input type="text" style="display:none" name="zettel" value="{{zettle_requested.id}}">
+      <p style=" margin: 10px 10px 10px 10px">
+          <label>Nombre</label><br/>
+          <input type="text" id="nombre" name="nombre">
+      </p>
+      <p>Numero de padres
+        <select id="numero_padres" name="numero_padres" onchange="more_dad(this.selectedIndex);">
+          <option value=1>1</option>
+          <option value=2>2</option>
+          <option value=3>3</option>
+        </select>
+      </p>
+      <p style=" margin: 10px 10px 10px 10px"> Etiqueta Padre
+        <select id="etiqueta_padre1" name="etiqueta_padre1">
+          {% for tag in tag_list %}
+            <option value="{{tag.id}}">{{tag.nombre}}</option>
+          {% endfor %}
+          <option value="no">Huerfano</option>
+        </select>
+      </p>
+      <p id="etiqueta_padre2" style=" margin: 10px 10px 10px 10px; display:None"> Etiqueta Padre
+        <select  name="etiqueta_padre2">
+          {% for tag in tag_list %}
+            <option value="{{tag.id}}">{{tag.nombre}}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <p id="etiqueta_padre3" style=" margin: 10px 10px 10px 10px; display:None"> Etiqueta Padre
+        <select  name="etiqueta_padre3">
+          {% for tag in tag_list %}
+            <option value="{{tag.id}}">{{tag.nombre}}</option>
+          {% endfor %}
+        </select>
+      </p>
+      <input type="submit">
+      <button type="button" class="btn cancel" onclick="closeForm_newTag()">Cerrar</button>
+  </form>
+
+</div>
+
+<form method="post" id="myForm"  action="/editar_zettle/{{zettle_requested.id}}" enctype="multipart/form-data">
+  <input type="submit" value="Guardar" style="font-weight:bold; font-size:20px;  margin: -0px 1000px 20px 200px">
+        {% csrf_token %}
+
+<button type="button" class="btn cancel" style="font-size:20px; font-weight:bold" onclick="relacionar_extracto_zettel({{ zettle_requested.id }})">Relacionar Extracto</button>
+<button type="button" class="btn cancel" style="font-size:20px; font-weight:bold" onclick="relacionar_zettel({{ zettle_requested.id }})">Relacionar Zettelcasten</button>
+<button type="button" style="font-size:20px; font-weight:bold" onclick="openForm_newTag()">Nueva Etiqueta</button>
+
+
+<div style="height: auto;">
+  <div style="width: 55%; float:left; margin: 30px -100px">
+    <textarea rows="8" cols="35" name="zettlecasten" form="myForm" style="font-size:30px; font-weight:bold;">{{ zettle_requested.contenido}}</textarea>
+  </div>
+
+  <div style="width: 45%;  height: 400px; float:right; margin: 20px -10px">
+    <p style="font-size:30px; font-weight:bold; margin:  20px -15px">
+      Tags:
+    </p>
+    {% for zettle_requested_tag in zettle_requested.etiqueta.all %}
+    <p style="font-size:20px; font-weight:normal; margin: 10px 0px 20px 10px">
+      - {{zettle_requested_tag.nombre}}
+    </p>
+    {% endfor %}
+    <p style="font-size:30px; font-weight:bold; margin:  20px -15px">
+      Nuevo Tag:
+    </p>
+    <div  style="overflow-y: scroll; height:60px;">
+      {% for tag in tag_list %}
+        <p><input type="checkbox" name="tag_{{tag.id}}" id="tag_{{tag.id}}"/>{{tag.nombre}}</p>
+      {% endfor %}
+    </div>
+
+  </div>
+
+</div>
+
+</form>
+
+<p style="font-size:40px; font-weight:bold;">
+  Zettelcasten Relacionados
+</p>
+
+<table  style="border-collapse: collapse; width: 100%; font-size:30px;">
+<tbody>
+
+  {% for zettle in zettle_list %}
+
+    <tr style="height:30px">
+      <td style="width: 5%;font-weight:bold; font-size:20px"><a href="/zettlecasten_in/{{zettle.id}}">{{zettle.id}}</a></td>
+      <td style="font-size:20px">{{zettle.contenido}}</td>
+    </tr>
+
+    <tr style="height:30px">
+      <td style="width: 3%;font-weight:bold; font-size:20px; color:white">a</td>
+    </tr>
+
+  {% endfor %}
+</tbody>
+</table>
+
+
+<p style="font-size:40px; font-weight:bold;">
+  Subrayados Relacionados
+</p>
+
+<table style="border-collapse: collapse; width: 100%; font-size:30px">
+<tbody>
+
+  <tr style="height:30px">
+    <td style="width: 3%;font-weight:bold; font-size:20px; color:white">a</td>
+  </tr>
+
+  {% for extracto in zettle_requested.extracto.all %}
+
+    <tr style="height:30px">
+      <td style="width: 5%;font-weight:bold; font-size:20px"><a href="/extracto/{{extracto.id}}">{{extracto.id}}</a></td>
+      <td style="font-size:20px">{{extracto.extracto}}</td>
+    </tr>
+
+    <tr style="height:30px">
+      <td style="width: 3%;font-weight:bold; font-size:20px; color:white">a</td>
+    </tr>
+
+  {% endfor %}
+</tbody>
+</table>
+
+
+
+<script>
+
+  function relacionar_zettel(id) {
+    window.location.replace("/relacionar_zettel_zet/".concat(id));
+  }
+
+  function relacionar_extracto_zettel(id) {
+    window.location.replace("/relacionar_zettel_ext/".concat(id));
+  }
+
+  function openForm_newTag(){
+    document.getElementById("myForm_Tag").style.display = "block";
+  }
+
+  function closeForm_newTag() {
+    document.getElementById("myForm_Tag").style.display = "none";
+  }
+
+  function btnClick() {
+      if (!validData())
+          return false;
+  }
+
+  function more_dad(num_dad){
+    if (num_dad==0){
+      document.getElementById("etiqueta_padre2").style.display = "none";
+      document.getElementById("etiqueta_padre3").style.display = "none";
+    } else if (num_dad==1){
+      document.getElementById("etiqueta_padre2").style.display = "block";
+      document.getElementById("etiqueta_padre3").style.display = "none";
+    } else if (num_dad==2){
+      document.getElementById("etiqueta_padre2").style.display = "block";
+      document.getElementById("etiqueta_padre3").style.display = "block";
+    }
+  }
+
+</script>
+
+
+{% endblock %}

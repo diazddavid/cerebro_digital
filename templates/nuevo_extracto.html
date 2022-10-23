@@ -1,0 +1,51 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<form method="post" id="myForm"  action="/guardar_nuevo_extracto" enctype="multipart/form-data">
+  <input type="submit" value="Guardar" style="font-weight:bold; font-size:20px;  margin: -0px 1000px 20px 200px">
+        {% csrf_token %}
+<div style="height: auto;">
+  <div style="width: 55%; float:left; margin: 30px -100px">
+    <textarea rows="10" cols="35" name="extracto" form="myForm" style="font-size:30px; font-weight:bold;">{{ extracto.extracto}}</textarea>
+  </div>
+
+  <div style="width: 45%;  height: 450px; float:right; margin: 20px -10px">
+    <p style="font-size:30px; font-weight:bold; margin: 10px 0px 20px -20px">
+      Bibliografia:
+    </p>
+    <select id="biblio" name="biblio">
+      {% for biblio in biblio_list %}
+        <option value="{{biblio.id}}">{{biblio.nombre}}</option>
+      {% endfor %}
+    </select>
+    <p style="font-size:30px; font-weight:bold; margin:  20px -15px">
+      Tags:
+    </p>
+    <div  style="overflow-y: scroll; height:60px;">
+      {% for tag in tag_list %}
+        <p><input type="checkbox" name="tag_{{tag.id}}" id="tag_{{tag.id}}"/>{{tag.nombre}}</p>
+      {% endfor %}
+    </div>
+    <p style="font-size:30px; font-weight:bold; margin:  20px -15px">
+      Pensar
+    </p><input type="checkbox"  name="pensar" {% if extracto.pensar %}checked="checked"{% endif %} style="font-weight:bold; font-size:20px; width: 20px; height: 20px; margin: -65px 0px 20px 100px">
+    <p style="font-size:30px; font-weight:bold; margin:  0px -15px">
+      Posicion: <textarea rows="1" cols="5" name="pos" form="myForm"></textarea>
+    </p>
+
+  </div>
+
+</div>
+
+</form>
+
+
+
+<script>
+
+
+</script>
+
+
+{% endblock %}

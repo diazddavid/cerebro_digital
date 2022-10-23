@@ -1,0 +1,194 @@
+{% extends "index.html" %}
+
+{% block content %}
+<!-- <h1 style=" margin: 10px 10px 10px 10px">Nuevos Items</h1> -->
+<form method="post" action="/{{rel_with}}_form/{{zet_id}}" enctype="multipart/form-data">
+    {% csrf_token %}
+<p><input type="submit" style="font-weight:bold; font-size:30px; margin: 10px 400px"></p>
+
+<input type="text" style="display:none" name="prev_page" value="{{prev_page}}">
+<p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
+  En aleatorio
+</p>
+
+  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <tbody>
+
+    <tr style="height:30px">
+      <td>Relacionar</td>
+      <td style="width: 3%">id</td>
+      <td style="width: 60%;font-weight:bold">Texto</td>
+    </tr>
+
+
+    {% for item_list in en_aleatorio %}
+
+    <tr style="height:30px">
+      <td style="width: 5%"><input type="checkbox" name="item_{{item_list.id}}" value="item_{{item_list.id}}"></td>
+      <td>{{item_list.id}}</td>
+      {% if is_Ext %}
+      <td style="width: 60%">
+        {{item_list.extracto}}
+        <p style="color:white">a</p></td>
+      {% else %}
+        <td style="width: 60%">
+        {{item_list.contenido}}
+        <p style="color:white">a</p></td>
+      {% endif %}
+    </tr>
+
+    {% endfor %}
+  </tbody>
+  </table>
+
+
+<p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
+  No aleatorio
+</p>
+
+  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <tbody>
+
+    <tr style="height:30px">
+      <td>Rel.</td>
+      <td style="width: 3%">id</td>
+      <td style="width: 60%;font-weight:bold">Texto</td>
+      <td style="width: 10%;font-weight:bold">
+        <select name="select" style="font-weight:bold" onchange="filter_tag()" id="tag_select">
+          <option value="TAG">Tag</option>
+          {% for tag in tag_list %}
+            <option value="{{tag.id}}" {% if tag_filter_id == tag.id %}selected{% endif %}>{{tag.nombre}}</option>
+          {% endfor %}
+        </select></td>
+      {% if is_Ext %}
+      <td style="width: 10%;font-weight:bold">
+        <select name="select" style="font-weight:bold" onchange="filter_bib()" id="bib_select">
+          <option value="BIB">Pertenece a</option>
+          {% for bib in bib_list %}
+            <option value="{{bib.id}}" {% if bib_filter_id == bib.id %}selected{% endif %}>{{bib.nombre}}</option>
+          {% endfor %}
+        </select></td>
+      {% endif %}
+    </tr>
+
+
+    {% for item_list in lista %}
+
+    <tr style="height:30px">
+      <td style="width: 3%"><input type="checkbox" name="item_{{item_list.id}}" value="item_{{item_list.id}}"></td>
+      <td>{{item_list.id}}</td>
+      {% if is_Ext %}
+      <td style="width: 60%">
+        {{item_list.extracto}}
+        <p style="color:white">a</p></td>
+      {% else %}
+        <td style="width: 60%">
+        {{item_list.contenido}}
+        <p style="color:white">a</p></td>
+      {% endif %}
+      <td style="width: 10%;vertical-align: middle;">
+        {% for tag in item_list.etiqueta.all %}
+          <p>{{tag.nombre}}</p>
+        {% endfor %}
+        <p style="color:white">a</p>
+      </td>
+    {% if is_Ext %}
+      <td style="width: 8%;vertical-align: middle;">
+        {{item_list.bibliografia.nombre}} <p style="color:white">a</p>
+      </td>
+    {% endif %}
+    </tr>
+
+    {% endfor %}
+  </tbody>
+  </table>
+
+{% if pagina_actual %}
+<button type="button" onclick="my_prev_page()">Pag. {{pagina_anterior}}</button>
+{% endif %}
+{% if ultima_pagina %}
+<button type="button" onclick="next_page()">Pag. {{pagina_siguiente}}</button>
+{% endif %}
+
+</form>
+<script>
+// When the user clicks on <div>, open the popup
+
+
+function next_page(){
+  {% if hay_filtro %}
+    window.location.replace("/{{rel_with}}/{{zet_id}}/page/{{pagina_siguiente}}");
+  {% else %}
+    window.location.replace("/{{rel_with}}/{{zet_id}}/page/{{pagina_siguiente}}/filtro/{{filtro}}");
+  {% endif %}
+}
+
+function my_prev_page(){
+  {% if hay_filtro %}
+    window.location.replace("/{{rel_with}}/{{zet_id}}/page/{{pagina_anterior}}");
+  {% else %}
+    window.location.replace("/{{rel_with}}/{{zet_id}}/page/{{pagina_anterior}}/filtro/{{filtro}}");
+  {% endif %}
+}
+
+function filter_tag(){
+
+  tag_select_value = document.getElementById("tag_select").value;
+
+  if(tag_select_value==="TAG"){
+    new_filter_tag="tagNO";
+
+  {% for tag in tag_list %}
+  }else if(tag_select_value==="{{tag.id}}"){
+      new_filter_tag="tag{{tag.id}}";
+  {% endfor %}
+  }
+
+  {% if is_Ext %}
+  filter_text = "{{filtro}}";
+  if (filter_text===""){
+    prev_filter_bib="bibNO";
+  }else if(filter_text==="0"){
+    prev_filter_bib="bibNO";
+  }else{
+    prev_filter_bib = filter_text.split("_")[1];
+  }
+  newFilter = new_filter_tag.concat("_",prev_filter_bib);
+
+  {% else %}
+  newFilter = new_filter_tag
+  {% endif %}
+
+  window.location.replace("/{{rel_with}}/{{zet_id}}/page/{{pagina_actual}}/filtro/".concat(newFilter));
+}
+
+function filter_bib(){
+
+  bib_select_value = document.getElementById("bib_select").value;
+
+  if(bib_select_value==="BIB"){
+    new_filter_bib="bibNO";
+
+  {% for bib in bib_list %}
+  }else if(bib_select_value==="{{bib.id}}"){
+      new_filter_bib="bib{{bib.id}}";
+  {% endfor %}
+  }
+
+  filter_text = "{{filtro}}";
+  if (filter_text===""){
+    prev_filter_tag="tagNO";
+  }else if(filter_text==="0"){
+    prev_filter_tag="tagNO";
+  }else{
+    prev_filter_tag = filter_text.split("_")[0];
+  }
+  newFilter = prev_filter_tag.concat("_",new_filter_bib);
+  window.location.replace("/{{rel_with}}/{{zet_id}}/page/{{pagina_actual}}/filtro/".concat(newFilter));
+}
+
+
+</script>
+
+
+{% endblock %}

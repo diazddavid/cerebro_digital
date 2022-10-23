@@ -1,0 +1,24 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1 style="font-size:70px; margin: 10px 10px 10px 10px">{{biblio_obj.nombre}}</h1>
+
+
+<form method="post" id="myForm"  action="/relacionar_zettel_ext/{{zet_id}}" enctype="multipart/form-data">
+  <input type="submit" value="Relacionar Extracto" style="font-weight:bold; font-size:20px;  margin: -65px 1000px 20px 200px">
+        {% csrf_token %}
+</form>
+
+<form method="post" id="myForm"  action="/relacionar_zettel_ze/{{zet_id}}" enctype="multipart/form-data">
+  <input type="submit" value="Relacionar Zettelcasten" style="font-weight:bold; font-size:20px;  margin: -65px 1000px 20px 200px">
+        {% csrf_token %}
+</form>
+
+<script>
+// When the user clicks on <div>, open the popup
+
+
+</script>
+
+
+{% endblock %}

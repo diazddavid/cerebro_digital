@@ -1,0 +1,37 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<form method="post" id="myForm"  action="/guardar_nuevo_zettel" enctype="multipart/form-data">
+  <input type="submit" value="Guardar" style="font-weight:bold; font-size:20px;  margin: -0px 1000px 20px 200px">
+        {% csrf_token %}
+<div style="height: auto;">
+  <div style="width: 55%; float:left; margin: 30px -100px">
+    <textarea rows="10" cols="35" name="extracto" form="myForm" style="font-size:30px; font-weight:bold;">{{ extracto.extracto}}</textarea>
+  </div>
+
+  <div style="width: 45%;  height: 450px; float:right; margin: 20px -10px">
+    <p style="font-size:30px; font-weight:bold; margin:  20px -15px">
+      Tags:
+    </p>
+    <div  style="overflow-y: scroll; height:120px;">
+      {% for tag in tag_list %}
+        <p><input type="checkbox" name="tag_{{tag.id}}" id="tag_{{tag.id}}"/>{{tag.nombre}}</p>
+      {% endfor %}
+    </div>
+
+  </div>
+
+</div>
+
+</form>
+
+
+
+<script>
+
+
+</script>
+
+
+{% endblock %}

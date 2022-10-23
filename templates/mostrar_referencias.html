@@ -1,0 +1,157 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h1 style=" margin: 10px 10px 10px 10px">Nuevos Items</h1>
+
+<p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
+  Referencias
+</p>
+<article>
+
+  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <tbody>
+
+    <tr style="height:30px">
+      <td style="width: 60%;font-weight:bold">Texto</td>
+      <td style="width: 10%;font-weight:bold">
+        <select name="select" style="font-weight:bold" onchange="filter_tipo()" id="tipo_select">
+          <option value="TIPO">Tipo</option>
+          {% for tipo in tipo_list %}
+            <option value="{{tipo.id}}" {% if tipo_filter_id == tipo.id %}selected{% endif %}>{{tipo.nombre}}</option>
+          {% endfor %}
+        </select></td>
+      <td style="width: 10%;font-weight:bold">
+        <select name="select" style="font-weight:bold" onchange="filter_bib()" id="bib_select">
+          <option value="BIB">Pertenece a</option>
+          {% for bib in bib_list %}
+            <option value="{{bib.id}}" {% if bib_filter_id == bib.id %}selected{% endif %}>{{bib.nombre}}</option>
+          {% endfor %}
+        </select></td>
+
+      <td style="width: 5%">Borrar</td>
+    </tr>
+
+
+    {% for referencia in lista_referencias %}
+
+    <tr style="height:30px">
+      <td style="width: 60%">{{referencia.referencia}}<p style="color:white">a</p></td>
+      <td style="width: 10%;vertical-align: middle;">
+        {% for tipo in referencia.tipo.all %}
+          <p>{{tipo.nombre}}</p>
+        {% endfor %}
+        <p style="color:white">a</p>
+      </td>
+      <td style="width: 8%;vertical-align: middle;">
+        {% for bib in referencia.bibliografia.all %}
+          <p>{{tipo.nombre}}</p>
+        {% endfor %}
+      </td>
+
+      <td style="width: 8%;vertical-align: middle;">
+        <form method="post" id="myForm{{referencia.id}}"  action="/eliminar_referencia/{{referencia.id}}" enctype="multipart/form-data">
+          <input type="submit" value="Borrar" >
+        </form>
+      </td>
+    </tr>
+
+    {% endfor %}
+  </tbody>
+  </table>
+
+
+</article>
+{% if pagina_actual %}
+<button type="button" onclick="prev_page()">Pag. {{pagina_anterior}}</button>
+{% endif %}
+{% if ultima_pagina %}
+<button type="button" onclick="next_page()">Pag. {{pagina_siguiente}}</button>
+{% endif %}
+
+<script>
+// When the user clicks on <div>, open the popup
+
+function prev_page(){
+
+  {% if hay_filtro %}
+  window.location.replace("/referencias/page/{{pagina_anterior}}");
+  {% else %}
+  window.location.replace("/referencias/page/{{pagina_anterior}}/filtro/{{filtro}}");
+  {% endif %}
+}
+
+function next_page(){
+  {% if hay_filtro %}
+    window.location.replace("/referencias/page/{{pagina_siguiente}}");
+  {% else %}
+    window.location.replace("/referencias/page/{{pagina_siguiente}}/filtro/{{filtro}}");
+  {% endif %}
+}
+
+function filter_tipo(){
+
+  tipo_select_value = document.getElementById("tipo_select").value;
+
+  if(tipo_select_value==="TIPO"){
+    new_filter_tipo="tipoNO";
+
+  {% for tipo in tipo_list %}
+  }else if(tipo_select_value==="{{tipo.id}}"){
+      new_filter_tipo="tipo{{tipo.id}}";
+  {% endfor %}
+  }
+
+  filter_text = "{{filtro}}";
+  if (filter_text===""){
+    prev_filter_bib="bibNO";
+  }else if(filter_text==="0"){
+    prev_filter_bib="bibNO";
+  }else{
+    prev_filter_bib = filter_text.split("_")[1];
+  }
+  newFilter = new_filter_tipo.concat("_",prev_filter_bib);
+  window.location.replace("/referencias/page/{{pagina_actual}}/filtro/".concat(newFilter));
+}
+
+function filter_bib(){
+
+  bib_select_value = document.getElementById("bib_select").value;
+
+  if(bib_select_value==="BIB"){
+    new_filter_bib="bibNO";
+
+  {% for bib in bib_list %}
+  }else if(bib_select_value==="{{bib.id}}"){
+      new_filter_bib="bib{{bib.id}}";
+  {% endfor %}
+  }
+
+  filter_text = "{{filtro}}";
+  if (filter_text===""){
+    prev_filter_tipo="tipoNO";
+  }else if(filter_text==="0"){
+    prev_filter_tipo="tipoNO";
+  }else{
+    prev_filter_tipo = filter_text.split("_")[0];
+  }
+  newFilter = prev_filter_tipo.concat("_",new_filter_bib);
+  window.location.replace("/referencias/page/{{pagina_actual}}/filtro/".concat(newFilter));
+}
+// function more_dad(num_dad){
+//   if (num_dad==0){
+//     document.getElementById("etiqueta_padre2").style.display = "none";
+//     document.getElementById("etiqueta_padre3").style.display = "none";
+//   } else if (num_dad==1){
+//     document.getElementById("etiqueta_padre2").style.display = "block";
+//     document.getElementById("etiqueta_padre3").style.display = "none";
+//   } else if (num_dad==2){
+//     document.getElementById("etiqueta_padre2").style.display = "block";
+//     document.getElementById("etiqueta_padre3").style.display = "block";
+//   }
+// }
+
+
+</script>
+
+
+{% endblock %}

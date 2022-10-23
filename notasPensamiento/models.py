@@ -3,6 +3,7 @@ from django.db import models
 class Etiqueta(models.Model):
     nombre = models.CharField(max_length=150)
     etiqueta_hijo = models.ManyToManyField("self", blank=True)
+    etiqueta_padre = models.ManyToManyField("self", blank=True)
 
 class Tipo(models.Model):
     nombre = models.CharField(max_length=150)
@@ -45,6 +46,7 @@ class Extracto(models.Model):
     etiqueta = models.ManyToManyField(Etiqueta, null=True)
     bibliografia = models.ForeignKey(Bibliografia, on_delete = models.CASCADE, blank=True, null=True)
     huerfano = models.IntegerField(default=1)
+    en_aleatorio = models.BooleanField(default=False)
 
 class Zettelcasten(models.Model):
     contenido = models.CharField(max_length=5000)
@@ -53,6 +55,7 @@ class Zettelcasten(models.Model):
     zettlecasten = models.ManyToManyField("self", blank=True, null=True)
     date_creation = models.DateField(blank=True, null=True)
     huerfano = models.IntegerField(default=1, null=True)
+    en_aleatorio = models.BooleanField(default=False)
 
 
 # Create your models here.
