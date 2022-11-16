@@ -26,7 +26,7 @@
         </select>
         <p>
           <input type="submit">
-          <button type="button" class="btn cancel" onclick="closeForm_hmtl()">Cerrar</button>
+          <button type="button" class="btn cancel" onclick="closeForm()">Cerrar</button>
   </form>
 
 </div>
@@ -54,7 +54,26 @@
         </select>
         <p>
           <input type="submit">
-          <button type="button" class="btn cancel" onclick="closeForm()">Cerrar</button>
+          <button type="button" class="btn cancel" onclick="closeForm_hmtl()">Cerrar</button>
+  </form>
+
+</div>
+
+<button type="button" onclick="openForm_zett()">Procesar Grabaciones</button>
+
+<!-- The form -->
+<div class="form-popup" id="myForm_zett">
+  <p style=" margin: 10px 10px 10px 10px">
+      <label>Procesar Grabaciones</label><br/>
+  </p>
+  <form method="post" action="/process_zettelcasten" enctype="multipart/form-data">
+      {% csrf_token %}
+      <p style=" margin: 10px 10px 10px 10px">
+          <label>Add file (single): </label><br/>
+          <input type="file" name="fichero_txt">
+      </p>
+          <input type="submit">
+          <button type="button" class="btn cancel" onclick="closeForm_zet()">Cerrar</button>
   </form>
 
 </div>
@@ -116,7 +135,7 @@
 </p>
 <article>
 
-  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <table border="1" style="border-collapse: collapse; width: 120%; margin-left:-120px">
   <tbody>
 
       <tr style="height:30px">
@@ -128,6 +147,7 @@
         <td style="width: 8%;font-weight:bold">Pensar</td>
         <td style="width: 8%;font-weight:bold">Eliminar</td>
         <td style="width: 8%;font-weight:bold">Enviar</td>
+        <td style="width: 8%;font-weight:bold">Hacer Ref.</td>
       </tr>
 
 
@@ -161,6 +181,7 @@
         <td style="width: 8%;vertical-align: middle;"><input type="checkbox" name="pensar" {% if Subrayados.pensar == 1 %} checked {% endif %}></td>
         <td style="width: 8%;vertical-align: middle;"><button type="button" class="btn cancel" onclick="eliminar_extracto({{ Subrayados.id}})">Eliminar</button></td>
         <td style="width: 8%;vertical-align: middle;"><input type="submit"></td>
+        <td style="width: 8%;vertical-align: middle;"><button type="button" class="btn cancel" onclick="hacer_ref({{ Subrayados.id}})">Ref.</button></td>
       </tr>
     </form>
 
@@ -175,12 +196,12 @@
 </p>
 <article>
 
-  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <table border="1" style="border-collapse: collapse; width: 120%;margin-left:-120px">
   <tbody>
 
       <tr style="height:30px">
-        <td style="width: 30%;font-weight:bold">Referencia</td>
-        <td style="width: 7%;font-weight:bold">Tipo</td>
+        <td style="width: 20%;font-weight:bold">Referencia</td>
+        <td style="width: 10%;font-weight:bold">Tipo</td>
         <!-- <td style="width: 20%;font-weight:bold">Comentario</td> -->
         <!-- <td style="width: 12.5%;">Tipo</td> -->
         <td style="width: 20%;font-weight:bold">Bibliografia</td>
@@ -193,8 +214,8 @@
     <form method="post" action="/editar_referencia/{{ Referencia.id }}" id="ref_{{ Referencia.id }}" enctype="multipart/form-data">
         {% csrf_token %}
       <tr style="height:30px">
-        <td style="width: 35%;"><textarea rows="1" cols="50" name="Referencia" form="ref_{{ Referencia.id }}">{{ Referencia.referencia }}</textarea></td>
-        <td style="width: 7%;vertical-align: middle;">
+        <td style="width: 30%;"><textarea rows="3" cols="50" name="Referencia" form="ref_{{ Referencia.id }}">{{ Referencia.referencia }}</textarea></td>
+        <td style="width: 10%;vertical-align: middle;">
           <select name="tipo" size="3">
             {% for tipo in tipo_list %}
               <option {% if tipo.nombre == Referencia.tipo.all.first.nombre %} selected="selected" {% endif %}> {{ tipo.nombre }}</option>
@@ -227,7 +248,7 @@
 </p>
 <article>
 
-  <table border="1" style="border-collapse: collapse; width: 120%;">
+  <table border="1" style="border-collapse: collapse; width: 120%;margin-left:-120px">
   <tbody>
 
       <tr style="height:30px">
@@ -243,7 +264,7 @@
     <form method="post" action="/editar_zettelcasten/{{ zettlecasten.id }}" id="zet_{{ zettlecasten.id }}" enctype="multipart/form-data">
         {% csrf_token %}
       <tr style="height:30px">
-        <td style="width: 40%;"><textarea rows="1" cols="60" name="contenido" form="zet_{{ zettlecasten.id }}">{{ zettlecasten.contenido }}</textarea></td>
+        <td style="width: 40%;"><textarea rows="3" cols="60" name="contenido" form="zet_{{ zettlecasten.id }}">{{ zettlecasten.contenido }}</textarea></td>
         <td style="width: 10%;vertical-align: middle;">
           <div  style="overflow-y: scroll; height:60px;">
             {% for tag in tag_list %}
@@ -274,6 +295,7 @@ function openForm_newTag(){
   document.getElementById("myForm_hmtl").style.display = "none";
   document.getElementById("myForm").style.display = "none";
   document.getElementById("myForm_Tag").style.display = "block";
+  document.getElementById("myForm_zett").style.display = "none";
 }
 
 function closeForm_newTag() {
@@ -284,6 +306,7 @@ function openForm_txt() {
   document.getElementById("myForm_hmtl").style.display = "none";
   document.getElementById("myForm").style.display = "block";
   document.getElementById("myForm_Tag").style.display = "none";
+  document.getElementById("myForm_zett").style.display = "none";
 }
 
 function closeForm() {
@@ -294,10 +317,22 @@ function openForm_HTML() {
   document.getElementById("myForm").style.display = "none";
   document.getElementById("myForm_hmtl").style.display = "block";
   document.getElementById("myForm_Tag").style.display = "none";
+  document.getElementById("myForm_zett").style.display = "none";
 }
 
 function closeForm_hmtl() {
   document.getElementById("myForm_hmtl").style.display = "none";
+}
+
+function openForm_zett() {
+  document.getElementById("myForm").style.display = "none";
+  document.getElementById("myForm_hmtl").style.display = "none";
+  document.getElementById("myForm_Tag").style.display = "none";
+  document.getElementById("myForm_zett").style.display = "block";
+}
+
+function closeForm_zet() {
+  document.getElementById("myForm_zett").style.display = "none";
 }
 
 
@@ -308,6 +343,10 @@ function btnClick() {
 
 function eliminar_extracto(id) {
   window.location.replace("/eliminar_extracto/".concat(id));
+}
+
+function hacer_ref(id){
+  window.location.replace("/extracto_a_ref/".concat(id));
 }
 
 function eliminar_referencia(id) {

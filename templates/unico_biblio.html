@@ -3,6 +3,8 @@
 {% block content %}
 <h1 style="font-size:70px; margin: 10px 10px 10px 10px">{{biblio_obj.nombre}}</h1>
 
+<button type="button" style="font-size:20px; font-weight:bold;" onclick="imprimir_libro()">Imprimir Libro</button>
+<button type="button" style="font-size:20px; font-weight:bold;" onclick="imprimir_libro_soloP()">Imprimir Solo Pensar</button>
 
 <div style="height: auto;">
   <div style="width: 30%; float:left; margin: 20px 0px">
@@ -36,7 +38,6 @@
 
 <div>
   <button type="button" style="font-size:20px; font-weight:bold; margin: 70px 0px 20px 10px" onclick="openForm_newTag()">Nueva Etiqueta</button>
-
 </div>
 
 <!-- The form -->
@@ -209,24 +210,33 @@ function btnClick() {
 }
 
 function eliminar_extracto(id) {
-  window.location.replace("eliminar_extracto/".concat(id));
+  window.location.replace("/eliminar_extracto/".concat(id));
 }
 
 function eliminar_referencia(id) {
-  window.location.replace("eliminar_referencia/".concat(id));
+  window.location.replace("/eliminar_referencia/".concat(id));
 }
 
 function eliminar_zettel(id) {
-  window.location.replace("eliminar_zettel/".concat(id));
+  window.location.replace("/eliminar_zettel/".concat(id));
 }
 
 function relacionar_zettel(id) {
-  window.location.replace("relacionar_zettel/".concat(id));
+  window.location.replace("/relacionar_zettel/".concat(id));
 }
 
 function relacionar_extracto_zettel(id) {
-  window.location.replace("relacionar_extracto_zettel/".concat(id));
+  window.location.replace("/relacionar_extracto_zettel/".concat(id));
 }
+
+function imprimir_libro() {
+  window.location.replace("/imprimir_libro/".concat({{biblio_obj.id}}));
+}
+
+function imprimir_libro_soloP() {
+  window.location.replace("/imprimir_libro/".concat({{biblio_obj.id}}).concat("solopensar/1"));
+}
+
 
 function more_dad(num_dad){
   if (num_dad==0){

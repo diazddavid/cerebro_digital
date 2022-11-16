@@ -6,6 +6,20 @@ from django.db.models import Q
 from datetime import datetime
 import random
 
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import BaseDocTemplate, PageTemplate, Flowable, FrameBreak, KeepTogether, PageBreak, Spacer
+from reportlab.platypus import Frame, PageTemplate, KeepInFrame
+from reportlab.platypus import (Table, TableStyle, BaseDocTemplate)
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from .models import *
 
 def bibliografia(request):
@@ -156,9 +170,9 @@ def editar_extracto(request, id):
 
     to_edit.posicion = int(request.POST.get('posicion'))
     if request.POST.get('pensar') == "on":
-        to_edit.pensar = True
+        to_edit.pensar = 1
     else:
-        to_edit.pensar = False
+        to_edit.pensar = 0
 
     to_edit.huerfano = 0
 
@@ -171,9 +185,9 @@ def editar_extracto_pagina(request, id):
     to_edit.extracto = request.POST.get('extracto')
 
     if request.POST.get('pensar') == "on":
-        to_edit.pensar = True
+        to_edit.pensar = 1
     else:
-        to_edit.pensar = False
+        to_edit.pensar = 0
     to_edit.save()
 
     to_edit = obtener_etiquetas(request, to_edit)
@@ -194,7 +208,7 @@ def editar_referencia(request, id):
 
     # to_edit.comentario = request.POST.get('Comentario')
 
-    # to_edit.huerfano = 0
+    to_edit.huerfano = 0
 
     to_edit.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -206,7 +220,7 @@ def editar_zettelcasten(request, id):
     to_edit.etiqueta.clear()
     to_edit = obtener_etiquetas(request, to_edit)
 
-    # to_edit.huerfano = 0
+    to_edit.huerfano = 0
 
     to_edit.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -352,21 +366,13 @@ def mostrar_bibliografia(request, id):
 
     return HttpResponse(template.render(context, request))
 
-def mostrar_subrayados(request, page=0, filtro="0"):
+def get_lista_subrayados(request, page=0, filtro="0"):
     lista_subrayados = Extracto.objects.filter(~Q(extracto="VACIO"))
-    tag_list = Etiqueta.objects.filter(~Q(nombre="VACIO"))
-    bib_list = Bibliografia.objects.all().filter(existe=1)
-
     tag_id = 0
     bib_id = 0
 
-    init_item = page*15
-    end_item = (page+1)*15
-
     if filtro != "0":
         # La forma que tienen es tagID_bibID, Añadir boton para resetear filtros
-        hay_filtro = 0
-        print(filtro)
         filtros_arr = filtro.split("_")
         filtro_tag = filtros_arr[0]
         filtro_bib = filtros_arr[1]
@@ -382,6 +388,22 @@ def mostrar_subrayados(request, page=0, filtro="0"):
             bib_id = int(bib_id)
             bib = Bibliografia.objects.get(id=bib_id)
             lista_subrayados = lista_subrayados.filter(bibliografia=bib)
+
+
+    return lista_subrayados, tag_id, bib_id
+
+def mostrar_subrayados(request, page=0, filtro="0"):
+    tag_list = Etiqueta.objects.filter(~Q(nombre="VACIO"))
+    bib_list = Bibliografia.objects.all().filter(existe=1)
+
+    [lista_subrayados, tag_id, bib_id] = get_lista_subrayados(request, page, filtro)
+
+    init_item = page*15
+    end_item = (page+1)*15
+
+    if filtro != "0":
+        # La forma que tienen es tagID_bibID, Añadir boton para resetear filtros
+        hay_filtro = 0
     else:
         hay_filtro = 1
 
@@ -477,22 +499,12 @@ def mostrar_referencias(request, page=0, filtro="0"):
 
     return HttpResponse(template.render(context, request))
 
-
-def mostrar_zettlecasten(request, page=0, filtro="0"):
+def obtener_lista_zettle(request, page, filtro):
     lista_zettlecasten = Zettelcasten.objects.filter(~Q(contenido="VACIO"))
-    tag_list = Etiqueta.objects.filter(~Q(nombre="VACIO"))
-    bib_list = Bibliografia.objects.all().filter(existe=1)
-
     tag_id = 0
     bib_id = 0
 
-    init_item = page*15
-    end_item = (page+1)*15
-
     if filtro != "0":
-        # La forma que tienen es tagID_bibID, Añadir boton para resetear filtros
-        hay_filtro = 0
-        print(filtro)
         filtros_arr = filtro.split("_")
         filtro_tag = filtros_arr[0]
         filtro_bib = filtros_arr[1]
@@ -508,6 +520,21 @@ def mostrar_zettlecasten(request, page=0, filtro="0"):
             bib_id = int(bib_id)
             bib = Bibliografia.objects.get(id=bib_id)
             lista_zettlecasten = lista_zettlecasten.filter(bibliografia=bib)
+
+    return lista_zettlecasten, tag_id, bib_id
+
+def mostrar_zettlecasten(request, page=0, filtro="0"):
+    tag_list = Etiqueta.objects.filter(~Q(nombre="VACIO"))
+    bib_list = Bibliografia.objects.all().filter(existe=1)
+
+    [lista_zettlecasten, tag_id, bib_id] = obtener_lista_zettle(request, page, filtro)
+    init_item = page*15
+    end_item = (page+1)*15
+
+    if filtro != "0":
+        # La forma que tienen es tagID_bibID, Añadir boton para resetear filtros
+        hay_filtro = 0
+
     else:
         hay_filtro = 1
 
@@ -616,7 +643,7 @@ def generar_aleatorio(request):
 
     zettle_no_aleatorio = Zettelcasten.objects.filter(en_aleatorio=False)
     zettle_no_aleatorio = zettle_no_aleatorio.filter(~Q(contenido="VACIO"))
-    extracto_no_aleatorio = Extracto.objects.filter(pensar=True)
+    extracto_no_aleatorio = Extracto.objects.filter(pensar=1)
     extracto_no_aleatorio = extracto_no_aleatorio.filter(~Q(extracto="VACIO"))
     extracto_no_aleatorio = extracto_no_aleatorio.filter(en_aleatorio=False)
 
@@ -645,6 +672,7 @@ def generar_aleatorio(request):
         ext_to_mod.save()
 
     return HttpResponseRedirect("/aleatorio")
+    # return enviar_aleatorios()
 
 def mostrar_aleatorios(request):
     zettle_aleatorio = Zettelcasten.objects.filter(en_aleatorio=True)
@@ -659,6 +687,46 @@ def mostrar_aleatorios(request):
 
 
     return HttpResponse(template.render(context, request))
+
+def get_aleat_mail():
+    mail_content = ""
+    mail_content = mail_content + "                     ZETTELCASTEN\n\n"
+    for zettel in Zettelcasten.objects.filter(en_aleatorio=True):
+        mail_content = mail_content + zettel.contenido + "\n\n"
+
+    mail_content = mail_content + "\n\n                     EXTRACTOS\n\n"
+    for extracto in Extracto.objects.filter(en_aleatorio=True):
+        mail_content = mail_content + extracto.extracto + "\n\n"
+
+    mail_content = mail_content + "\n\n\n A PENSAR!"
+
+    return mail_content
+
+def enviar_aleatorios(request):
+    mail_content = get_aleat_mail()
+    subject = "Aleatorios " + datetime.now().strftime("%d %b, %Y")
+
+    sender_address = 'zettelcasten.mail@gmail.com'
+    sender_pass = 'roqtgobttvdohnnu'
+
+    receiver_address = 'd.diazri@yahoo.com'
+
+    #Setup the MIME
+    message = MIMEMultipart()
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = subject   #The subject line
+    #The body and the attachments for the mail
+    message.attach(MIMEText(mail_content, 'plain'))
+    #Create SMTP session for sending the mail
+    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session.starttls() #enable security
+    session.login(sender_address, sender_pass) #login with mail_id and password
+    text = message.as_string()
+    session.sendmail(sender_address, receiver_address, text)
+    session.quit()
+
+    return HttpResponseRedirect("/aleatorio")
 
 
 def crear_zettle_zet(request, id_related):
@@ -917,9 +985,9 @@ def guardar_nuevo_extracto(request):
         nuevo_extracto.save()
 
         if request.POST.get('pensar') == "on":
-            nuevo_extracto.pensar = True
+            nuevo_extracto.pensar = 1
         else:
-            nuevo_extracto.pensar = False
+            nuevo_extracto.pensar = 0
 
         nuevo_extracto.save()
 
@@ -951,4 +1019,155 @@ def guardar_nuevo_zettel(request):
 
     return HttpResponseRedirect("/zettlecasten_in/"+str(nuevo_zettel.id))
 # Create your views here.
-# Create your views here.
+
+def print_paragraph(L, filtro, filename):
+    buffer = BytesIO()
+    width_A4, height_A4 = A4
+
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+
+    text_frame = Frame(
+        x1=1.50 * cm,  # From left
+        y1=1.50 * cm,  # From bottom
+        height= height_A4 - 3 * cm,
+        width= width_A4 - 3 * cm,
+        leftPadding=0 * cm,
+        bottomPadding=0 * cm,
+        rightPadding=0 * cm,
+        topPadding=0 * cm,
+        showBoundary=1,
+        id='text_frame')
+
+    # Establish a document
+    doc = BaseDocTemplate(buffer, pagesize=A4)
+
+    story = L # (alternative, story.add(L))
+    # story.append()
+    # Creating a page template
+    frontpage = PageTemplate(id='FrontPage',
+                             frames=[text_frame]
+                             )
+    if filtro != "0":
+        doc.drawString(100,100,filtro)
+    # Adding the story to the template and template to the document
+    doc.addPageTemplates(frontpage)
+    doc.build(story)
+
+    # doc.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+
+    return response
+
+def imprimir_lista_subrayados(request, page=0, filtro="0", solopensar=0):
+    now = datetime.now()
+    if filtro == "0":
+        filtro_text = "noFiltro"
+    else:
+        filtro_text = filtro
+    filename = "Extractos_" + filtro + now.strftime("_%d_%m_%y.pdf")
+
+    [lista_subrayados, tag_id, bib_id] = get_lista_subrayados(request, page, filtro)
+    L = []
+
+    if solopensar == 1:
+        lista_subrayados = lista_subrayados.filter(pensar=1)
+
+    styleSheet = getSampleStyleSheet()
+    for item in lista_subrayados:
+        L.append(KeepTogether(Paragraph("Posicion" + str(item.posicion), styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph(item.extracto, styleSheet["Heading2"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+
+    response = print_paragraph(L, filtro, filename)
+
+    return response
+
+def imprimir_zett(request, page=0, filtro="0"):
+    now = datetime.now()
+    if filtro == "0":
+        filtro_text = "noFiltro"
+    else:
+        filtro_text = filtro
+    filename = "Extractos_" + filtro + now.strftime("_%d_%m_%y.pdf")
+
+    [lista_subrayados, tag_id, bib_id] = obtener_lista_zettle(request, page, filtro)
+    L = []
+
+    styleSheet = getSampleStyleSheet()
+    for item in lista_subrayados:
+        L.append(KeepTogether(Paragraph(str(item.date_creation), styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph(item.contenido, styleSheet["Heading2"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+
+    response = print_paragraph(L, filtro, filename)
+
+    return response
+
+def imprimir_bibliografia(request, id, solopensar = 0):
+    bib_obj = Bibliografia.objects.get(id=id)
+    now = datetime.now()
+    filename = "Biblio_" + bib_obj.nombre.replace(" ","_") + now.strftime("_%d_%m_%y.pdf")
+
+    lista_subrayados = Extracto.objects.filter(bibliografia__id=id)
+    L = []
+
+    if solopensar == 1:
+        lista_subrayados = lista_subrayados.filter(pensar=1)
+
+    styleSheet = getSampleStyleSheet()
+    for item in lista_subrayados:
+        L.append(KeepTogether(Paragraph("Posicion" + str(item.posicion), styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph(item.extracto, styleSheet["Heading2"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+        L.append(KeepTogether(Paragraph("", styleSheet["BodyText"])))
+
+    filtro = "0"
+    response = print_paragraph(L, filtro, filename)
+
+    return response
+
+def cambiar_extracto_ref(request, id):
+    to_edit = Extracto.objects.get(id=id)
+    nueva_referencia = Referencia.objects.create(referencia=to_edit.extracto, huerfano=1)
+
+    nueva_referencia.bibliografia.add(to_edit.bibliografia)
+    nueva_referencia.save()
+    to_edit.delete()
+
+    return HttpResponseRedirect("/nuevos_items")
+
+def process_zettelcasten(request):
+    if request.method == 'POST':
+
+        my_file = request.FILES["fichero_txt"]
+        is_txt = 1
+        save_next_line = 0
+        fecha = datetime.now()
+
+        for undecoded_line in my_file:
+            line = undecoded_line.decode(encoding="utf8")
+
+            if save_next_line==1:
+                save_next_line = 0
+                zettel = line
+                nuevo_zettel = Zettelcasten.objects.create(contenido=zettel, date_creation=fecha, huerfano=1)
+                nuevo_zettel.save()
+
+            grab_pos = line.find("Grabacion_")
+            if grab_pos != -1:
+                grab_pos = grab_pos+len("Grabacion_")
+                fecha_str = line[grab_pos:grab_pos+15]
+                save_next_line = 1
+                fecha = datetime.strptime(fecha_str, '%Y%m%dT%H%M%S')
+                # except:
+                #     fecha = datetime.now()
+    return HttpResponseRedirect("/nuevos_items")

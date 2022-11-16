@@ -3,6 +3,7 @@
 {% block content %}
 <h1 style=" margin: 10px 10px 10px 10px">Nuevos Items</h1>
 <button type="button" class="btn cancel" style="font-size:20px; font-weight:bold" onclick="nuevo_zettel()">Nuevo Zettelcasten</button>
+<button type="button" class="btn cancel" style="font-size:20px; font-weight:bold" onclick="imprimir_zett()">Imprimir Zettelcasten</button>
 
 <p style="font-size:50px; font-weight:bold; margin: 10px 0px 20px 10px">
   Zettlecasten
@@ -132,7 +133,15 @@ function filter_bib(){
 }
 
 function nuevo_zettel(){
-  window.location.replace("/nuevo_zettlecasten");  
+  window.location.replace("/nuevo_zettlecasten");
+}
+
+function imprimir_zett(){
+  {% if hay_filtro %}
+    window.location.replace("/imprimir_zett/page/{{pagina_siguiente}}");
+  {% else %}
+    window.location.replace("/imprimir_zett/page/{{pagina_siguiente}}/filtro/{{filtro}}");
+  {% endif %}
 }
 // function more_dad(num_dad){
 //   if (num_dad==0){
