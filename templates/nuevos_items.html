@@ -155,7 +155,8 @@
     <form method="post" action="/editar_extracto/{{ Subrayados.id }}" id="sub_{{ Subrayados.id }}" enctype="multipart/form-data">
         {% csrf_token %}
       <tr style="height:30px">
-        <td style="width: 40%;"><textarea rows="4" cols="60" name="extracto" form="sub_{{ Subrayados.id }}">{{ Subrayados.extracto }}</textarea></td>
+        <td style="width: 40%;"><textarea rows="4" cols="60" name="extracto" form="sub_{{ Subrayados.id }}">{{ Subrayados.extracto }}
+{% if Subrayados.comentario != "" %}Comentario: {{ Subrayados.comentario }}{% endif %}</textarea></td>
         <td style="width: 15%;vertical-align: middle;">
           <div  style="overflow-y: scroll; height:60px;">
             {% for tag in tag_list %}
@@ -163,11 +164,6 @@
               {{tag.nombre}}</p>
             {% endfor %}
           </div>
-          <!-- <select name="etiqueta" size="3">
-            {% for tag in tag_list %}
-              <option {% if tag.nombre == Subrayados.etiqueta.all.first.nombre %} selected="selected" {% endif %}> {{ tag.nombre }}</option>
-            {% endfor %}
-          </select> -->
         </td>
         <td style="width: 8%;vertical-align: middle;">
           <select id="biblio" name="biblio">

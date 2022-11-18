@@ -44,7 +44,7 @@ def bibliografia(request):
 
 
 def nuevos_items(request):
-    subrayados_huerfanas = Extracto.objects.all().filter(~Q(extracto="VACIO")&Q(huerfano=1))
+    subrayados_huerfanas = Extracto.objects.all().filter(~Q(extracto="VACIO")&Q(huerfano=1)).order_by('-id')
     referencias_huerfanas = Referencia.objects.all().filter(~Q(referencia="VACIO")&Q(huerfano=1))
     zettlecasten_huerfanas = Zettelcasten.objects.all().filter(~Q(contenido="VACIO")&Q(huerfano=1))
     tag_list  = Etiqueta.objects.all().filter(~Q(nombre="VACIO"))
@@ -81,6 +81,7 @@ def procesar_txt(request):
             yellow_text = "Yellow"
             pink_text = "Pink"
             orange_text = "Orange"
+            note_text = "Note:"
         elif request.POST.get('is_html') == "on":
             my_file = request.FILES["fichero_html"]
             is_html = 1
@@ -89,10 +90,12 @@ def procesar_txt(request):
             yellow_text = "amarillo"
             pink_text = "rosa"
             orange_text = "naranja"
+            note_text = "Nota - "
 
         save_next_line = 0
         pensar = 0
         referencia = 0
+        previous_id = -1
 
         for undecoded_line in my_file:
             line = undecoded_line.decode(encoding="utf8")
@@ -120,7 +123,11 @@ def procesar_txt(request):
                     position_txt = separate_pipe[1].split("-")[-1].split(" ")[-1]
                 posicion = int(position_txt.replace(",",""))
                 continue
-
+            elif line.find(note_text) != -1 and previous_id>-1:
+                extracto_a_editar = Extracto.objects.get(id=previous_id)
+                comentario_guardar = line[len(note_text):]
+                extracto_a_editar.comentario = comentario_guardar
+                extracto_a_editar.save()
             if save_next_line==1:
                 text = line
                 save_next_line = 0
@@ -130,6 +137,7 @@ def procesar_txt(request):
                     nuevo_extracto = Extracto.objects.create(extracto=extracto, posicion=posicion, pensar=pensar, bibliografia=bibliografia_default)
                     nuevo_extracto.etiqueta.add(etiqueta_default)
                     nuevo_extracto.save()
+                    previous_id = nuevo_extracto.id
                     print("Processed Extracto")
                 else:
                     nueva_referencia = Referencia.objects.create(referencia=extracto, huerfano=1)
@@ -174,6 +182,7 @@ def editar_extracto(request, id):
     else:
         to_edit.pensar = 0
 
+    to_edit.comentario = ""
     to_edit.huerfano = 0
 
     to_edit.save()

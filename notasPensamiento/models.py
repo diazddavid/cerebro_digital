@@ -46,6 +46,7 @@ class Extracto(models.Model):
     etiqueta = models.ManyToManyField(Etiqueta, null=True)
     bibliografia = models.ForeignKey(Bibliografia, on_delete = models.CASCADE, blank=True, null=True)
     huerfano = models.IntegerField(default=1)
+    comentario = models.CharField(max_length=5000, default="", null=True)
     en_aleatorio = models.BooleanField(default=False)
 
 class Zettelcasten(models.Model):
