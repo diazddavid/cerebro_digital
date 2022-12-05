@@ -44,7 +44,6 @@ python-lsp-jsonrpc==1.0.0
 PyYAML==6.0
 queuelib==1.5.0
 reportlab==3.6.12
-scikit-learn-intelex==2021.20221004.171807
 scipy==1.9.1
 semantic-version==2.10.0
 setuptools-rust==1.5.2
