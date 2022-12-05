@@ -1,7 +1,7 @@
 databases:
-  - name: cerebroDigital
-    databaseName: cerebroDigital
-    user: cerebroDigital
+  - name: mysite
+    databaseName: mysite
+    user: mysite
 
 services:
   - type: web
@@ -12,7 +12,7 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: cerebroDigital
+          name: mysite
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
